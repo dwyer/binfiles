@@ -1,0 +1,3 @@
+#!/bin/sh
+# Find words matching the given regex.
+grep ^"$1"$ /usr/share/dict/words

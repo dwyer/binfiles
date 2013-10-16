@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+
+"""Converts text to a brainfuck program that prints it."""
+
+import sys
+
+LINEWIDTH = 72
+lines = []
+last = 0
+for c in sys.stdin.read():
+    this = ord(c)
+    diff = this - last
+    last = this
+    char = '+' if diff > 0 else '-'
+    lines.append(char * abs(diff) + '.')
+out = ''.join(lines)
+out = '\n'.join(out[i:i+LINEWIDTH] for i in xrange(0, len(out), LINEWIDTH))
+print out

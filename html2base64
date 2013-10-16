@@ -1,0 +1,5 @@
+#!/bin/sh
+# Converts HTML file with base64 encoded URL.
+text='data:text/html;base64,'`base64 "$@"`
+echo $text
+echo $text | wc -c

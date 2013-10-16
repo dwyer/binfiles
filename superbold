@@ -1,0 +1,10 @@
+#!/bin/sh
+# Prints some super bold text.
+superbold() {
+    perl -M"encoding(utf8)" -p -e "y/!-~/\x{ff01}-\x{ff5e}/"
+}
+if [ -z "$1" ]; then
+    superbold
+else
+    echo "$@" | superbold
+fi

@@ -1,0 +1,13 @@
+#!/bin/sh
+# Gives an md5 hash of a directory.
+if [ `uname` = "Darwin" ]; then
+    cmd='md5 -r'
+else
+    cmd='md5sum'
+fi
+for i in "$@"; do
+    if [ -d "$i" ]; then
+        sum=`find "$i" -type f -exec $cmd {} ++ | awk '{print $1}' | sort | md5`
+        echo $sum $i
+    fi
+done
