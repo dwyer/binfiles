@@ -1,25 +1,43 @@
 #!/usr/bin/env python
 # find duplicates
-import os, sys
+
+import argparse
+import os
+import sys
 
 from collections import defaultdict
-from hashlib import md5
+from hashlib import md5, sha1, sha256
+from zlib import crc32
 
-d = defaultdict(list)
+HASH_FN_DEFAULT = 'crc32'
+HASH_FNS = {
+    HASH_FN_DEFAULT: crc32,
+    'md5': lambda x: md5(x).hexdigest(),
+    'sha1': lambda x: sha1(x).hexdigest(),
+    'sha256': lambda x: sha256(x).hexdigest(),
+}
 
-def go(path):
+def go(path, dct, fn):
     if os.path.isdir(path):
         for name in os.listdir(path):
-            go(os.path.join(path, name))
+            go(os.path.join(path, name), dct, fn)
     else:
         with open(path) as f:
-            d[md5(f.read()).hexdigest()].append(path)
+            key = fn(f.read())
+            dct[key].append(path)
             f.close()
 
-for arg in sys.argv[1:]:
-    go(arg)
+parser = argparse.ArgumentParser()
+parser.add_argument('-H', nargs='?', choices=HASH_FNS.keys(),
+                    default=HASH_FN_DEFAULT)
+parser.add_argument('files', nargs='*')
+args = parser.parse_args()
 
-for md5sum, paths in d.items():
+dct = defaultdict(list)
+for path in args.files:
+    go(path, dct, fn=HASH_FNS[args.H])
+
+for md5sum, paths in dct.items():
     if len(paths) > 1:
         for path in paths:
             print md5sum, path
