@@ -1,4 +1,4 @@
 #!/bin/sh
 # Remove Xcode temporary files.
-rm -rf ~/Library/Developer/Xcode/DerivedData/*
-rm -rf ~/Library/Application\ Support/iPhone\ Simulator/*.*/Applications/*
+rm -rf ~/Library/Developer/Xcode/DerivedData
+rm -rf ~/Library/Application\ Support/iPhone\ Simulator
