@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+import os
+import re
+import sys
+import urllib
+import urlparse
+from bs4 import BeautifulSoup
+matcher = re.compile('^\.(gif|jpe?g|png)$', re.IGNORECASE)
+for url in sys.argv[1:]:
+    url = urlparse.urlparse(url)
+    res = urllib.urlopen(url.geturl()
+    soup = BeautifulSoup(res.read(), 'lxml')
+    for a in soup.find_all('a'):
+        href = a.get('href')
+        if not href:
+            continue
+        href = urlparse.urljoin(url.geturl(), href)
+        root, ext = os.path.splitext(href)
+        if not ext or not matcher.match(ext):
+            continue
+        scheme, address = href.split('//')
+        dirname, filename = os.path.split(address)
+        dirname = dirname.replace('/', '-')
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+        filepath = os.path.join(dirname, filename)
+        print 'Downloading %s to %s' % (href, filepath)
+        urllib.urlretrieve(href, filepath)
