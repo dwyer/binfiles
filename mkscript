@@ -1,53 +1,55 @@
 #!/bin/sh
 
-args=`getopt s:e $*`
-set -- $args
+usage() {
+    echo usage: `basename $0` [-e] [-s suffix] filename >&2
+    exit 2
+}
 
-eflag=0
-sflag=0
+eflag=false
 ext=
-for i do
-    case "$i" in
-        -e)
-            eflag=1
-            shift;;
-        -s)
-            sflag=1
-            shift
-            ext="$1"
-            shift;;
-        --)
-            shift; break;;
+while getopts es: opt; do
+    case "$opt" in
+        e)
+            eflag=true
+            ;;
+        s)
+            ext="$OPTARG"
+            ;;
+        ?)
+            usage
+            ;;
     esac
 done
 
 shebang() {
-    case $1 in
+    case "$1" in
         py)
             echo '#!/usr/bin/env python'
             ;;
         *)
             echo '#!/bin/sh'
+            ;;
     esac
 }
 
-case $# in
+shift $(($OPTIND - 1))
+case "$#" in
     1)
         name="$1"
-        if [[ -e "$name" ]]; then
+        if [ -e "$name" ]; then
             echo "$name" already exists >&2
             exit -1
         fi
-        if [[ $ext == "" ]]; then
+        if [ -z $ext ]; then
             ext=${name##*.}
         fi
         shebang "$ext" >"$name"
         chmod +x "$name"
-        if [ $eflag -eq 1 ]; then
+        if $eflag; then
             "$EDITOR" "$name"
         fi
         ;;
     *)
-        echo "usage: `basename $0` [-e] [-s suffix] filename" >&2
-        exit 2
+        usage
+        ;;
 esac
