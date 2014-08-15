@@ -11,7 +11,7 @@ import threading
 
 from collections import defaultdict
 
-import Image
+from PIL import Image
 import SimpleHTTPServer
 
 REPONAME = '.tag'
