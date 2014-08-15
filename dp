@@ -1,0 +1,23 @@
+#!/bin/sh
+# dp - duplicate files and directories
+
+if [ $# -eq 0 ]; then
+    echo usage: `basename "$0"` file ... >&2
+    exit 1
+fi
+
+for src; do
+    if [ ! -e "$src" ]; then
+        echo file "$src" does not exist >&2
+        exit 2
+    fi
+    n=1
+    while true; do
+        dest="$src.$n"
+        if [ ! -e "$dest" ]; then
+            cp "$src" "$dest"
+            break
+        fi
+        n=$(($n + 1))
+    done
+done
