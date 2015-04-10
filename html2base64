@@ -1,5 +1,62 @@
 #!/bin/sh
 # Converts HTML file with base64 encoded URL.
-text='data:text/html;base64,'`base64 "$@"`
-echo $text
-echo $text | wc -c
+
+usage() {
+    echo >&2 "usage: `$basename $0` [-e ENCODING] [-t MIMETYPE] FILENAME"
+    exit 2
+}
+
+encoding=
+type=
+
+while getopts e:t: opt; do
+    case "$opt" in
+        e)
+            encoding="$OPTARG"
+            ;;
+        t)
+            type="$OPTARG"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+case $# in
+    0)
+        text=`base64 | paste -s -d ''`
+        ;;
+    1)
+        text=`base64 "$1" | paste -s -d ''`
+        ;;
+    *)
+        usage
+esac
+
+case "$type" in
+    html)
+        type="text/html"
+        ;;
+    text)
+        type="text/plain"
+        ;;
+    *)
+        if [ $# -eq 0 ]; then
+            type="text/plain"
+        else
+            type=`mimetype "$1" | awk '{print $2}'`
+        fi
+        ;;
+esac
+
+url="base64,$text"
+if [ ! -z "$encoding" ]; then
+    url="charset=$encoding;$url"
+fi
+url="$type;$url"
+url="data:$url"
+echo "$url"
+# echo $text | wc -c
