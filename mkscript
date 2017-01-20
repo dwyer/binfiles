@@ -25,6 +25,14 @@ shebang() {
     case "$1" in
         py)
             echo '#!/usr/bin/env python'
+            echo '#-*-coding:utf-8-*-'
+            echo 'from __future__ import absolute_import'
+            echo 'from __future__ import division'
+            echo 'from __future__ import print_function'
+            echo 'from __future__ import unicode_literals'
+            ;;
+        py3)
+            echo '#!/usr/bin/env python3'
             ;;
         *)
             echo '#!/bin/sh'
@@ -38,7 +46,7 @@ case "$#" in
         name="$1"
         if [ -e "$name" ]; then
             echo "$name" already exists >&2
-            exit -1
+            exit 1
         fi
         if [ -z $ext ]; then
             ext=${name##*.}
